@@ -1,6 +1,4 @@
-<script setup lang="ts">
-// Phase 1 placeholder. Real table arrives in Phase 3.
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <v-card>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 
-// Phase 1 placeholder. Real profile arrives in Phase 5.
 const route = useRoute()
 const code = route.params.code as string
 </script>
