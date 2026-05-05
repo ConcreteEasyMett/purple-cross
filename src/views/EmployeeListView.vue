@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 import { useEmployeesStore } from '@/stores/employees'
 import EmploymentStatusChip from '@/components/EmploymentStatusChip.vue'
 import { employmentStatus, terminationStatus } from '@/utils/employeeStatus'
+
+const router = useRouter()
+
+function viewEmployee(code: string) {
+  router.push({ name: 'employee-profile', params: { code } })
+}
 
 const store = useEmployeesStore()
 const { employees } = storeToRefs(store)
@@ -162,9 +169,15 @@ function clearFilters() {
         <EmploymentStatusChip :date="item.terminationDate" kind="termination" />
       </template>
 
-      <template #[`item.actions`]>
+      <template #[`item.actions`]="{ item }">
         <div class="d-flex justify-end" style="gap: 4px">
-          <v-btn icon="mdi-eye-outline" size="small" variant="text" disabled />
+          <v-btn
+            icon="mdi-eye-outline"
+            size="small"
+            variant="text"
+            title="View profile"
+            @click.stop="viewEmployee(item.code)"
+          />
           <v-btn icon="mdi-pencil-outline" size="small" variant="text" disabled />
           <v-btn icon="mdi-delete-outline" size="small" variant="text" disabled />
         </div>
