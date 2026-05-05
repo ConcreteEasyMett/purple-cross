@@ -1,8 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AppLayout from '@/layouts/AppLayout.vue'
+</script>
 
 <template>
   <v-app>
-    <router-view />
+    <AppLayout />
   </v-app>
 </template>
 
