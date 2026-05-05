@@ -4,9 +4,13 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useEmployeesStore } from '@/stores/employees'
 import EmploymentStatusChip from '@/components/EmploymentStatusChip.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { employmentStatus, terminationStatus } from '@/utils/employeeStatus'
+import { useSnackbar } from '@/composables/useSnackbar'
+import type { Employee } from '@/types/employee'
 
 const router = useRouter()
+const snackbar = useSnackbar()
 
 function viewEmployee(code: string) {
   router.push({ name: 'employee-profile', params: { code } })
@@ -14,6 +18,28 @@ function viewEmployee(code: string) {
 
 const store = useEmployeesStore()
 const { employees } = storeToRefs(store)
+
+const deleteTarget = ref<Employee | null>(null)
+const confirmOpen = ref(false)
+
+function askDelete(employee: Employee) {
+  deleteTarget.value = employee
+  confirmOpen.value = true
+}
+
+function cancelDelete() {
+  confirmOpen.value = false
+  deleteTarget.value = null
+}
+
+function confirmDelete() {
+  const target = deleteTarget.value
+  if (!target) return
+  store.remove(target.code)
+  snackbar.success(`Employee ${target.code} deleted`)
+  confirmOpen.value = false
+  deleteTarget.value = null
+}
 
 const search = ref('')
 const departmentFilter = ref<string | null>(null)
@@ -179,7 +205,14 @@ function clearFilters() {
             @click.stop="viewEmployee(item.code)"
           />
           <v-btn icon="mdi-pencil-outline" size="small" variant="text" disabled />
-          <v-btn icon="mdi-delete-outline" size="small" variant="text" disabled />
+          <v-btn
+            icon="mdi-delete-outline"
+            size="small"
+            variant="text"
+            color="error"
+            title="Delete"
+            @click.stop="askDelete(item)"
+          />
         </div>
       </template>
 
@@ -190,4 +223,18 @@ function clearFilters() {
       </template>
     </v-data-table>
   </v-card>
+
+  <ConfirmDialog
+    v-model="confirmOpen"
+    title="Delete employee?"
+    confirm-text="Delete"
+    confirm-color="error"
+    @confirm="confirmDelete"
+    @cancel="cancelDelete"
+  >
+    <template v-if="deleteTarget">
+      This will permanently remove <strong>{{ deleteTarget.fullName }}</strong>
+      ({{ deleteTarget.code }}) from the directory. This action cannot be undone.
+    </template>
+  </ConfirmDialog>
 </template>

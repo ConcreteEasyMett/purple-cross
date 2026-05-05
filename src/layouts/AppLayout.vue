@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useSnackbar } from '@/composables/useSnackbar'
 
 const route = useRoute()
+const { state: snackbar } = useSnackbar()
 
 type Crumb = { title: string; to?: string; disabled?: boolean }
 
-// Breadcrumbs derived from the current route. Kept here (not in meta) so
-// the profile crumb can include the live :code param.
 const crumbs = computed<Crumb[]>(() => {
   const base: Crumb = { title: 'Employees', to: '/employees' }
   switch (route.name) {
@@ -45,4 +45,16 @@ const crumbs = computed<Crumb[]>(() => {
       <router-view />
     </v-container>
   </v-main>
+
+  <v-snackbar
+    v-model="snackbar.visible"
+    :color="snackbar.color"
+    :timeout="snackbar.timeout"
+    location="bottom right"
+  >
+    {{ snackbar.message }}
+    <template #actions>
+      <v-btn variant="text" @click="snackbar.visible = false">Close</v-btn>
+    </template>
+  </v-snackbar>
 </template>

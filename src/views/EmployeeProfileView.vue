@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useEmployeesStore } from '@/stores/employees'
 import EmploymentStatusChip from '@/components/EmploymentStatusChip.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import { useSnackbar } from '@/composables/useSnackbar'
 
 const route = useRoute()
 const router = useRouter()
 const store = useEmployeesStore()
+const snackbar = useSnackbar()
 const { employees } = storeToRefs(store)
 
 const code = computed(() => String(route.params.code ?? ''))
 const employee = computed(() => employees.value.find((e) => e.code === code.value))
+
+const confirmOpen = ref(false)
 
 function formatDate(value: string | null): string {
   if (!value) return '—'
@@ -21,6 +26,19 @@ function formatDate(value: string | null): string {
 }
 
 function backToList() {
+  router.push({ name: 'employee-list' })
+}
+
+function askDelete() {
+  confirmOpen.value = true
+}
+
+function confirmDelete() {
+  const target = employee.value
+  if (!target) return
+  store.remove(target.code)
+  snackbar.success(`Employee ${target.code} deleted`)
+  confirmOpen.value = false
   router.push({ name: 'employee-list' })
 }
 </script>
@@ -39,7 +57,12 @@ function backToList() {
           <div class="d-flex" style="gap: 8px">
             <v-btn variant="text" prepend-icon="mdi-arrow-left" @click="backToList">Back</v-btn>
             <v-btn variant="tonal" prepend-icon="mdi-pencil-outline" disabled>Edit</v-btn>
-            <v-btn variant="tonal" color="error" prepend-icon="mdi-delete-outline" disabled>
+            <v-btn
+              variant="tonal"
+              color="error"
+              prepend-icon="mdi-delete-outline"
+              @click="askDelete"
+            >
               Delete
             </v-btn>
           </div>
@@ -87,6 +110,17 @@ function backToList() {
         </v-row>
       </v-card-text>
     </v-card>
+
+    <ConfirmDialog
+      v-model="confirmOpen"
+      title="Delete employee?"
+      confirm-text="Delete"
+      confirm-color="error"
+      @confirm="confirmDelete"
+    >
+      This will permanently remove <strong>{{ employee.fullName }}</strong>
+      ({{ employee.code }}) from the directory. This action cannot be undone.
+    </ConfirmDialog>
   </template>
 
   <v-card v-else class="text-center pa-8">
