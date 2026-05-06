@@ -2,8 +2,6 @@ import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
 
-// Corporate, muted theme for the Purple Cross dashboard.
-// One restrained purple accent on a near-white surface; everything else stays neutral.
 const purpleCrossLight = {
   dark: false,
   colors: {
