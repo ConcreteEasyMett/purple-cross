@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { useEmployeesStore } from '@/stores/employees'
 import EmploymentStatusChip from '@/components/EmploymentStatusChip.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import EmployeeFormDialog from '@/components/EmployeeFormDialog.vue'
 import { employmentStatus, terminationStatus } from '@/utils/employeeStatus'
 import { useSnackbar } from '@/composables/useSnackbar'
 import type { Employee } from '@/types/employee'
@@ -21,6 +22,11 @@ const { employees } = storeToRefs(store)
 
 const deleteTarget = ref<Employee | null>(null)
 const confirmOpen = ref(false)
+const createOpen = ref(false)
+
+function openCreate() {
+  createOpen.value = true
+}
 
 function askDelete(employee: Employee) {
   deleteTarget.value = employee
@@ -237,4 +243,27 @@ function clearFilters() {
       ({{ deleteTarget.code }}) from the directory. This action cannot be undone.
     </template>
   </ConfirmDialog>
+
+  <EmployeeFormDialog v-model="createOpen" mode="create" />
+
+  <v-btn
+    class="create-fab"
+    color="primary"
+    size="large"
+    elevation="6"
+    prepend-icon="mdi-plus"
+    @click="openCreate"
+  >
+    Create employee
+  </v-btn>
 </template>
+
+<style scoped>
+.create-fab {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  z-index: 100;
+  border-radius: 999px;
+}
+</style>
