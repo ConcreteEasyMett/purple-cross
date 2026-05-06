@@ -199,10 +199,14 @@ function clearFilters() {
       :headers="headers"
       :items="filtered"
       item-value="code"
-      :items-per-page="25"
+      :page="store.tablePage"
+      :items-per-page="store.tableItemsPerPage"
       :items-per-page-options="[10, 25, 50, 100]"
       density="comfortable"
+      mobile-breakpoint="sm"
       hover
+      @update:page="(v: number) => (store.tablePage = v)"
+      @update:items-per-page="(v: number) => (store.tableItemsPerPage = v)"
     >
       <template #[`item.dateOfEmployment`]="{ item }">
         <EmploymentStatusChip :date="item.dateOfEmployment" kind="employment" />
@@ -240,8 +244,24 @@ function clearFilters() {
       </template>
 
       <template #no-data>
-        <div class="text-center text-medium-emphasis py-6">
-          No employees match the current filters.
+        <div class="text-center text-medium-emphasis py-8">
+          <v-icon icon="mdi-account-search-outline" size="40" class="mb-2" />
+          <div class="text-body-2">
+            <template v-if="hasActiveFilter">
+              No employees match the current filters.
+            </template>
+            <template v-else> No employees yet. Use the button below to add one. </template>
+          </div>
+          <v-btn
+            v-if="hasActiveFilter"
+            class="mt-3"
+            variant="text"
+            size="small"
+            prepend-icon="mdi-filter-remove-outline"
+            @click="clearFilters"
+          >
+            Clear filters
+          </v-btn>
         </div>
       </template>
     </v-data-table>
@@ -278,9 +298,16 @@ function clearFilters() {
 <style scoped>
 .create-fab {
   position: fixed;
-  right: 32px;
-  bottom: 32px;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(24px + env(safe-area-inset-bottom));
   z-index: 100;
   border-radius: 999px;
+}
+
+@media (max-width: 600px) {
+  .create-fab {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+  }
 }
 </style>

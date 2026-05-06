@@ -32,6 +32,8 @@ function uniqueSorted(values: string[]): string[] {
 export const useEmployeesStore = defineStore('employees', {
   state: () => ({
     employees: (loadFromStorage() ?? (seed as Employee[])) as Employee[],
+    tablePage: 1,
+    tableItemsPerPage: 25,
   }),
 
   getters: {
