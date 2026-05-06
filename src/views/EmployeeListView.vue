@@ -22,10 +22,21 @@ const { employees } = storeToRefs(store)
 
 const deleteTarget = ref<Employee | null>(null)
 const confirmOpen = ref(false)
-const createOpen = ref(false)
+
+const formOpen = ref(false)
+const formMode = ref<'create' | 'edit'>('create')
+const formInitial = ref<Employee | null>(null)
 
 function openCreate() {
-  createOpen.value = true
+  formMode.value = 'create'
+  formInitial.value = null
+  formOpen.value = true
+}
+
+function openEdit(employee: Employee) {
+  formMode.value = 'edit'
+  formInitial.value = employee
+  formOpen.value = true
 }
 
 function askDelete(employee: Employee) {
@@ -210,7 +221,13 @@ function clearFilters() {
             title="View profile"
             @click.stop="viewEmployee(item.code)"
           />
-          <v-btn icon="mdi-pencil-outline" size="small" variant="text" disabled />
+          <v-btn
+            icon="mdi-pencil-outline"
+            size="small"
+            variant="text"
+            title="Edit"
+            @click.stop="openEdit(item)"
+          />
           <v-btn
             icon="mdi-delete-outline"
             size="small"
@@ -244,7 +261,7 @@ function clearFilters() {
     </template>
   </ConfirmDialog>
 
-  <EmployeeFormDialog v-model="createOpen" mode="create" />
+  <EmployeeFormDialog v-model="formOpen" :mode="formMode" :initial="formInitial" />
 
   <v-btn
     class="create-fab"

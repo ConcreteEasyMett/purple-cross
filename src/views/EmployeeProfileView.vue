@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { useEmployeesStore } from '@/stores/employees'
 import EmploymentStatusChip from '@/components/EmploymentStatusChip.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import EmployeeFormDialog from '@/components/EmployeeFormDialog.vue'
 import { useSnackbar } from '@/composables/useSnackbar'
 
 const route = useRoute()
@@ -17,6 +18,11 @@ const code = computed(() => String(route.params.code ?? ''))
 const employee = computed(() => employees.value.find((e) => e.code === code.value))
 
 const confirmOpen = ref(false)
+const editOpen = ref(false)
+
+function openEdit() {
+  editOpen.value = true
+}
 
 function formatDate(value: string | null): string {
   if (!value) return '—'
@@ -56,7 +62,9 @@ function confirmDelete() {
           </div>
           <div class="d-flex" style="gap: 8px">
             <v-btn variant="text" prepend-icon="mdi-arrow-left" @click="backToList">Back</v-btn>
-            <v-btn variant="tonal" prepend-icon="mdi-pencil-outline" disabled>Edit</v-btn>
+            <v-btn variant="tonal" prepend-icon="mdi-pencil-outline" @click="openEdit">
+              Edit
+            </v-btn>
             <v-btn
               variant="tonal"
               color="error"
@@ -121,6 +129,8 @@ function confirmDelete() {
       This will permanently remove <strong>{{ employee.fullName }}</strong>
       ({{ employee.code }}) from the directory. This action cannot be undone.
     </ConfirmDialog>
+
+    <EmployeeFormDialog v-model="editOpen" mode="edit" :initial="employee" />
   </template>
 
   <v-card v-else class="text-center pa-8">
