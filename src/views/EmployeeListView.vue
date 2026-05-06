@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useDisplay } from 'vuetify'
 import { useRouter } from 'vue-router'
 import { useEmployeesStore } from '@/stores/employees'
 import EmploymentStatusChip from '@/components/EmploymentStatusChip.vue'
@@ -36,6 +37,11 @@ onMounted(async () => {
   await nextTick()
   tableLoading.value = false
 })
+
+const { smAndDown } = useDisplay()
+const tableHeight = computed<string | undefined>(() =>
+  smAndDown.value ? undefined : 'max(280px, calc(100vh - 388px))',
+)
 
 function exportJson() {
   downloadEmployeesJson(store.employees)
@@ -229,6 +235,7 @@ function clearFilters() {
     <v-divider />
 
     <v-data-table
+      class="list-table"
       :headers="headers"
       :items="filtered"
       item-value="code"
@@ -236,6 +243,8 @@ function clearFilters() {
       :items-per-page="store.tableItemsPerPage"
       :items-per-page-options="[10, 25, 50, 100]"
       :loading="tableLoading"
+      :height="tableHeight"
+      fixed-header
       density="comfortable"
       mobile-breakpoint="sm"
       hover
