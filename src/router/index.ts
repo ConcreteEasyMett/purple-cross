@@ -37,4 +37,14 @@ const router = createRouter({
   routes,
 })
 
+const APP_NAME = 'Purple Cross — Employee Management'
+router.afterEach((to) => {
+  const meta = to.meta as { title?: string } | undefined
+  let pageTitle = meta?.title
+  if (to.name === 'employee-profile' && to.params.code) {
+    pageTitle = `Employee ${String(to.params.code)}`
+  }
+  document.title = pageTitle ? `${pageTitle} · ${APP_NAME}` : APP_NAME
+})
+
 export default router

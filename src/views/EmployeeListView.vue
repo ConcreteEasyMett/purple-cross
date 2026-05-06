@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useEmployeesStore } from '@/stores/employees'
@@ -30,6 +30,12 @@ const formMode = ref<'create' | 'edit'>('create')
 const formInitial = ref<Employee | null>(null)
 
 const importOpen = ref(false)
+
+const tableLoading = ref(true)
+onMounted(async () => {
+  await nextTick()
+  tableLoading.value = false
+})
 
 function exportJson() {
   downloadEmployeesJson(store.employees)
@@ -229,6 +235,7 @@ function clearFilters() {
       :page="store.tablePage"
       :items-per-page="store.tableItemsPerPage"
       :items-per-page-options="[10, 25, 50, 100]"
+      :loading="tableLoading"
       density="comfortable"
       mobile-breakpoint="sm"
       hover
