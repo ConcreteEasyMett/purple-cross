@@ -6,7 +6,9 @@ import { useEmployeesStore } from '@/stores/employees'
 import EmploymentStatusChip from '@/components/EmploymentStatusChip.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import EmployeeFormDialog from '@/components/EmployeeFormDialog.vue'
+import ImportEmployeesDialog from '@/components/ImportEmployeesDialog.vue'
 import { employmentStatus, terminationStatus } from '@/utils/employeeStatus'
+import { downloadEmployeesJson } from '@/utils/employeeImport'
 import { useSnackbar } from '@/composables/useSnackbar'
 import type { Employee } from '@/types/employee'
 
@@ -26,6 +28,13 @@ const confirmOpen = ref(false)
 const formOpen = ref(false)
 const formMode = ref<'create' | 'edit'>('create')
 const formInitial = ref<Employee | null>(null)
+
+const importOpen = ref(false)
+
+function exportJson() {
+  downloadEmployeesJson(store.employees)
+  snackbar.success(`Exported ${store.employees.length} records`)
+}
 
 function openCreate() {
   formMode.value = 'create'
@@ -136,6 +145,24 @@ function clearFilters() {
             </template>
           </v-card-subtitle>
         </div>
+        <v-menu location="bottom end">
+          <template #activator="{ props: menuProps }">
+            <v-btn
+              v-bind="menuProps"
+              variant="text"
+              icon="mdi-dots-vertical"
+              title="More actions"
+            />
+          </template>
+          <v-list density="compact">
+            <v-list-item prepend-icon="mdi-download-outline" @click="exportJson">
+              <v-list-item-title>Export JSON</v-list-item-title>
+            </v-list-item>
+            <v-list-item prepend-icon="mdi-upload-outline" @click="importOpen = true">
+              <v-list-item-title>Import JSON</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
     </v-card-item>
 
@@ -282,6 +309,8 @@ function clearFilters() {
   </ConfirmDialog>
 
   <EmployeeFormDialog v-model="formOpen" :mode="formMode" :initial="formInitial" />
+
+  <ImportEmployeesDialog v-model="importOpen" />
 
   <v-btn
     class="create-fab"
